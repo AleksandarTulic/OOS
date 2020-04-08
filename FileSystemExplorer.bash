@@ -103,6 +103,52 @@ find_some()
     #rm sample2.txt
 }
 
+#FINDDAT
+
+findDat()
+{
+    #ima problem akoo se unese kao datoteka *.txt tj da ispisuje sve datoteke sa txt ekstenzijom 
+    #tj kad razlomim u rijeci date naredbe
+    #bash ce zamjeniti naredbu *.txt sa svim datotekama koje se na laze u folderu u kome sam ja
+    #naredba nije trazena ali bi bilo pogodno za korisnika da pogleda koje sve datoteka se nalaze u direktorijumu ili sub-direktorijumu
+
+    if test -d ${words[2]}
+    then
+        file_count=$(find "${words[2]}" -name "${words[1]}" | wc -l)
+
+        if [ $file_count -gt 0 ]
+        then
+            echo "Trazeni fajlovi: "
+            echo
+            find "${words[2]}" -name "${words[1]}"
+        else
+            echo "Trazeni fajlovi nisu pronadjeni."
+            
+            a=${words[1]#*.}
+            echo $a
+            echo "Ukoliko zelite da sve datoteke sa ekstenzijom .$a ispisete unesite naredbu DA, u suprotnom naredbu NE."
+            read -p "Unesite naredbu: " b
+
+            if [ $b = "DA" ]
+            then 
+                file_count=$(find "${words[2]}" -name "*.$a" | wc -l)
+                if [ $file_count -gt 0 ]
+                then
+                    echo "Trazeni fajlovi: "
+                    find "${words[2]}" -name "*.$a"
+                else
+                    echo "Trazeni fajlovi nisu pronadjeni."
+                fi
+            else
+                return
+            fi
+        fi
+    else
+        echo "UPOZORENJE!!!"
+        echo "Putanja ${words[2]} ne postoji!!!"
+    fi
+}
+
 flag=true
 
 while [ $flag = true ]
@@ -127,7 +173,9 @@ do
 
     words=( $a )
     b=${#words[@]}
-    echo ${words[1]:`expr length ${words[1]} - 1`:`expr length ${words[1]}`}
+
+    echo "$a $b"
+    echo "${words[0]} ${words[1]} ${words[2]} ${words[3]} ${words[4]} ${words[5]}"
 
     if [ $b -eq 1 ]
     then
@@ -167,7 +215,6 @@ do
         elif [ ${words[0]} = "print" ]
         then
             print
-            echo "print"
         else
             echo "Naredba nije definisana!!!"
         fi
@@ -178,10 +225,14 @@ do
         elif [ ${words[0]} = "find" -a ${words[1]:0:1} = '"' -a ${words[1]:`expr length ${words[1]} - 1`:`expr length ${words[1]}`} = '"' ]
         then
             find_some
-            echo "find"
-        elif [ ${words[0]} = "findDat" ]
+        elif [ ${words[0]} = "findDat" -a ${words[2]:0:1} = '/' ]
         then
-            echo "findDat"
+            if [[ ${words[1]} == *[.]* ]]
+            then
+                findDat
+            else 
+                echo "Naredba nije definisana!!!"
+            fi
         else
             echo "Naredba nije definisana!!!"
         fi
