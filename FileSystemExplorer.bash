@@ -9,6 +9,24 @@
 #   ukoliko je tipa ASCII text i jos nekih tipova onda ne mozemo biti sigurni pa kazemo da to nije tekstualnog tipa
 #   ukoliko je nekih drugih tipova onda sigurno nije tekstualna datoteka
 
+go()
+{
+    if [ ${words[1]} = ".." ]
+    then
+        echo "Trenutna lokacija: $PWD"
+        cd ..
+        echo "Nova lokacija: $PWD"
+    elif test -d ${words[1]}
+    then
+        echo "Trenutna lokacija: $PWD"
+        cd ${words[1]}
+        echo "Nova lokacija: $PWD" 
+    else
+        echo "UPOZORENJE!!!"
+        echo "Putanja ${words[1]} ne postoji!!!"
+    fi
+}
+
 print()
 {
     isf=$(file ${words[1]})
@@ -174,9 +192,6 @@ do
     words=( $a )
     b=${#words[@]}
 
-    echo "$a $b"
-    echo "${words[0]} ${words[1]} ${words[2]} ${words[3]} ${words[4]} ${words[5]}"
-
     if [ $b -eq 1 ]
     then
         if [ $a = "login" ]
@@ -202,6 +217,7 @@ do
     then
         if [ ${words[0]} = "go" ]
         then
+            go
             echo "go"
         elif [ ${words[0]} = "create" -a ${words[1]} = "-d" ]
         then
