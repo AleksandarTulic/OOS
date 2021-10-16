@@ -1,0 +1,558 @@
+#!/bin/bash
+
+############################################################################
+###########                     FUNKCIJE               #####################
+############################################################################
+
+help()
+{
+    echo
+    echo "  1. LOGIN: "
+    echo "      - Opsti olik: login"
+    echo "      - Funkcija: prijava u program"
+    echo "      - Uspjeh:"
+    echo "          Korisnik - ime korisnika - se ulogovao :)"
+    echo "          Trenutna lokacija: - trenutna lokacija u hijerarhiji direktorijuma operativnog sistema - "
+    echo "      - Neuspjeh:"
+    echo "          Datoteka korisnickih naloga nije pronadjena!!! - datoteka ne postoji na definisanoj putanji"
+    echo "          Niste se ulogovali, pokusajte ponovo!!! - atributi(ime, password) se ne nalaze u security.txt datoteci, u kojoj se nalaze nalozi"
+    echo "  2.  WHERE: "
+    echo "      - Opsti olik: where"
+    echo "      - Funkcija: ispis trenutne lokacije"
+    echo "      - Napomena: uvijek se izvrsava uspjesno jer korisnik se uvijek nalazi na odgovarajucoj lokaciji"
+    echo "  3. GO: "
+    echo "      - Opsti olik: go putanja"
+    echo "      - Funkcija: promjena direktorijuma"
+    echo "      - Uspjeh:"
+    echo "          Prethodna lokacija: - lokacija na kojoj smo bili prije pokretanja naredbe -"
+    echo "          Trenutna lokacija: - lokacija na koju smo presli sa prethodne, i na kojoj se korisnik trenutno nalazi -"
+    echo "      - Neuspjeh:"
+    echo "          UPOZORENJE!!!"
+    echo "          Lokacija - putanja - ne postoji!!!"
+    echo "      - Napomena: - putanja se uvijek mora navesti"
+    echo "  4. CREATE: "
+    echo "      - Opsti oblik: create [-d] putanja"
+    echo "      - Funkcija:"
+    echo "          Ukoliko je navedeno -d onda se na - putanji - kreira direktorijum"
+    echo "          Ukoliko nije navedeno -d onda se na - putanji - kreira datoteka"
+    echo "      - Uspjeh:"
+    echo "          Direktorijum: Kreirana je novi direktorijum sa putanjom - putanja direktorijuma ukljucujuci kreiranog direktorijuma -"
+    echo "          Datoteka: Kreirana je nova datoteka sa putanjom - putanja datoteke ukljucujuci kreiranu datoteku -"
+    echo "      - Napomena:"
+    echo "          Ukoliko ne postoji - putanja - onda se ispisuju poruke:"
+    echo "              Putanja - putanja - ne postoji."
+    echo "              Zbog toga su kreirani dodatni direktorijumi."
+    echo "          I izvrsava se operacija kreiranja novog direktorijuma ili datoteke, pri cemu se to ova operacija najavljuje porukom:"
+    echo "              Ukoliko je direktorijum: Kreiran je novi direktorijum sa putanjom - putanja -"
+    echo "              Ukoliko je datoteka: Kreiran je nova datoteka sa putanjom - putanja -"
+    echo "  5. LIST: "
+    echo "      - Opsti oblik: list [putanja]"
+    echo "      - Funkcija: ispis stabla direktorijuma"
+    echo "      - Uspjeh:"
+    echo "          Struktura iz direktorijuma - putanja - je: "
+    echo "      - Neuspjeh:"
+    echo "          Putanja - putanja - ne postoji!!!"
+    echo "      - Napomena:"
+    echo "          Za uspjesno izvrsavanje ove naredbe je potrebna u nasoj implementaciji naredba - tree -"
+    echo "          Ukoliko nije instalirana trazit ce se od korisnika odluka da li zeli da instalira"
+    echo "          Ukoliko nece da instalira naredbu - tree - onda se prekida izvrsavanje operacije"
+    echo "          Ukoliko se navede putanja:"
+    echo "              Ispisuje stablo direktorijuma od te lokacije pa nadalje"
+    echo "              Ispisuje stablo direktorijuma od trenutne lokacije pa nadalje"
+    echo "      "
+    echo "  6. PRINT: "
+    echo "      - Opsti oblik: print datoteka"
+    echo "      - Funkcija: ispisuje sadrzaj tekstualne datoteke"
+    echo "      - Uspjeh:"
+    echo "          Sadrzaj tekstualne datoteke je:"
+    echo "      - Neuspjeh:"
+    echo "          Datoteka - naziv datoteke - ne postoji ili putanja ne postoji!!!"
+    echo "              ili"
+    echo "          Upozorenje!!!"
+    echo "          Moguce da je tekstualna datoteka ali nismo sigurni."
+    echo "          S'obzirom da nismo sigurni necemo citati sadrzaj datoteke."
+    echo "              ili"
+    echo "          Ovo nije tekstualna datoteka!!!"
+    echo "      - Napomena:"
+    echo "          - datoteka - se mora navesti"
+    echo "  7. FIND: "
+    echo "      - Opsti oblik: find \"tekst\" datoteka"
+    echo "      - Funkcija: ispisuje linije dokumenta na kome se nalazi izraz: \"tekst\""
+    echo "      - Upjeh:"
+    echo "          Izraz \"tekst\" se pojavljuje na mjestima:"
+    echo "      - Neuspjeh:"
+    echo "          Datoteka - naziv datoteke - ne postoji ili putanja ne postoji!!!"
+    echo "              ili"
+    echo "          Upozorenje!!!"
+    echo "          Moguce da je tekstualna datoteka ali nismo sigurni."
+    echo "          S'obzirom da nismo sigurni necemo citati sadrzaj datoteke"
+    echo "              ili"
+    echo "          Ovo nije tekstualna datoteka!!!"
+    echo "      - Napomena: "
+    echo "          - datoteka - se mora navesti"
+    echo "          - \"tekst\" - se mora navesti"
+    echo "  8. FINDDAT: "
+    echo "      - Opsti oblik: findDat datoteka putanja"
+    echo "      - Funkcija: pretrazuje stablo direktorijuma ciji je korijen naveden kao putanja i trazi datoteku koja ima isti naziv kao - datoteka -"
+    echo "      - Uspjeh:"
+    echo "          Trazeni fajlovi su:"
+    echo "      - Neuspjeh:"
+    echo "          Fajlovi - datoteka - nisu pronadjeni!!!"
+    echo "              ili"
+    echo "          Putanja - putanja - ne postoji!!!"
+    echo "      - Napomena: "
+    echo "          - ukoliko nema fajlova sa datim nazivom onda ce vam se ponuditi da vam se ispise svi fajlovi sa ekstenzijom - datoteke -"
+    echo "          - Za prethodno vazi da u imenu datoteke mora postojati ekstenzija npr. *.cpp"
+    echo
+}
+
+login_user()
+{
+    read -p "Unesite ime  : " ime
+    read -s -p "Unesite sifru: " password
+    echo
+
+    input="$fix_location/security.txt"
+
+    if test -f "$input"
+    then
+        while IFS= read -r line
+        do
+            line=($line)
+            
+            if [ $ime = ${line[0]} -a $password = ${line[1]} ]
+            then             
+                flag=true
+            fi
+        done < "$input"
+    else
+        echo "Datoteka korisnickih naloga nije pronadjena!!!"
+    fi
+
+    echo
+    if [ $flag = false ]
+    then
+        echo "Niste se ulogovali, pokusajte ponovo!!!"
+    else
+        echo
+        echo "Korisnik $ime se ulogovao, Dobrodosli u SManagement :)"
+        echo "Trenutna lokacija: $PWD"  
+    fi
+}
+
+where()
+{
+    echo
+    # ispisuje trenutnu lokaciju
+    echo "Trenutna lokacija: $PWD"
+    echo
+}
+
+go()
+{
+    #provjeravamo da li lokacija uopste postoji od datog mjesta
+    if test -d ${niz[1]}
+    then
+        echo "Prethodna lokacija: $PWD"
+        #idemo na novu lokaciju        
+        cd ${niz[1]}
+        echo "Trenutna lokacija: $PWD"
+ 
+    #nova lokacija ne postoji
+    else
+        echo "UPOZORENJE!!!"
+        echo "Putanja ${niz[1]} ne postoji!!!"
+    fi
+}
+
+create()
+{
+    #kreira se datoteka
+    if [ $duzina -eq 2 ]
+    then
+        #postoji znak / sto znaci da postoji putanja do kreiranja datoteke
+        if [[ ${niz[1]} == *['/']* ]]
+        then
+            #dobivamo putanju do mjetsa gje treba napraviti datoteku
+            putanja=${niz[1]%/*}
+            
+            if test -d $putanja
+            then
+                echo
+                echo "Kreirana je nova datoteka sa putanjom $PWD/${niz[1]}."
+                echo
+                touch "${niz[1]}"
+            else
+                echo
+                echo "Putanja ${putanja} ne postoji."
+                echo "Zbog toga su kreirani dodatni direktorijumi."
+                echo "Kreirana je nova datoteka sa putanjom $PWD/${niz[1]}."
+                echo
+
+                mkdir -p "$putanja"
+                touch "${niz[1]}"
+            fi
+        #odmah se kreira datoteka
+        else
+            echo
+            echo "Kreirana je nova datoteka sa putanjom $PWD/${niz[1]}."
+            echo                
+            touch "${niz[1]}"
+        fi
+    #kreira se direktorijum
+    else 
+        if [[ ${niz[2]} == *['/']* ]]
+        then
+            if test -d ${niz[2]}
+            then
+                echo
+                echo "Kreiran je novi direktorijum sa putanjom $PWD/${niz[2]}."
+                echo
+                mkdir "${niz[2]}"
+            else
+                echo
+                echo "Putanja ${niz[2]} ne postoji."
+                echo "Zbog toga su kreirani dodatni direktorijumi."
+                echo "Kreiran je novi direktorijum sa putanjom $PWD/${niz[2]}."
+                echo
+                mkdir -p "${niz[2]}"
+            fi
+        else
+            echo
+            echo "Kreiran je novi direktorijum sa putanjom $PWD/${niz[2]}"
+            echo
+            mkdir ${niz[2]}
+        fi
+    fi
+}
+
+list()
+{
+    flag=false
+    a=$(which tree)
+    if [ "$a" = "" ]
+    then
+        echo
+        echo "Potrebno je instairati paket tree!!!"
+        echo
+        echo "|------------------------------|"
+        echo "|- instaliranje ---------------|"
+        echo "|- prekid ---------------------|"
+        echo "|------------------------------|"
+        
+        read -p "Unesite naredbu: " com
+
+        if [ "$com" = "instaliranje" ]
+        then            
+            sudo apt-get update
+            sudo apt-get install tree
+            flag=true
+        fi
+    else
+        flag=true   
+    fi
+
+    if [ $flag = true ]
+    then
+        if [ $duzina -eq 1 ] # ispisujemo hijerarhiju iz datog mjesta
+        then
+            echo "Struktura iz direktorijuma $PWD je: "
+            echo
+            
+            tree
+        else
+            # provjeravamo dali dati direktorijum postoji
+            if test -d ${niz[1]}
+            then
+                echo
+                # ispisujemo hijerarhiju iz datog direktorijuma
+                echo "Struktura iz direktorijuma $PWD/${niz[1]} je: "
+                echo
+
+                tree "${niz[1]}"
+            else # direktorijum ne postoji
+                echo 
+                echo "Putanja ${niz[1]} ne postoji!!!"
+                echo
+            fi
+        fi
+    fi
+
+    flag=false
+}
+
+print()
+{
+    isf=$(file ${niz[1]})
+    isf=( $isf )
+    duzina_isf=${#isf[@]}
+    
+    #provjeravamo da li je ovo SAMO tekstualna datoteka
+    #ako jeste ispisuje sljedeci text: putanja: ASCII text
+    if [ $duzina_isf -eq 3 -a "${isf[1]}" = "ASCII" -a "${isf[2]}" = "text" ]
+    then
+        echo
+        echo "Sadrzaj tekstualne datoteke je: "
+        echo
+        cat ${niz[1]}
+    # datoteka se ne moze otvoriti ili ne postoji ili neki drugi razlog
+    elif [ $duzina_isf -ge 3 -a "${isf[1]}" = "cannot" -a "${isf[2]}" = "open" ]
+    then
+        echo
+        echo "Datoteka ${niz[1]} ne postoji ili putanja ne postoji!!!"
+        echo
+    # datoteka je mozda tekstualna ali moze biti i sa ekstenzijom .cpp ili sa nekom drugom pa necemo citati jer je trazeno samo tekstualne
+    else
+        echo "Upozorenje!!!"
+
+        flag_print=false
+
+        for i in `seq 1 $duzina_isf`
+        do
+            if [ "${isf[$i]}" = "ASCII" ]
+            then
+                flag_print=true
+            fi
+        done
+        
+        if [ $flag_print = true ]
+        then
+            echo "Moguce da je tekstualna datoteka ali nismo sigurni."
+            echo "S'obzirom da nismo sigurni necemo citati sadrzaj datoteke."
+        else
+            echo "Ovo nije tekstualna datoteka!!!"
+        fi   
+    fi
+}
+
+find_tekst_datoteka()
+{
+    isf=$(file ${niz[2]})
+    isf=( $isf )
+    duzina_isf=${#isf[@]}
+    
+    # provjeravamo da li je ovo SAMO tekstualna datoteka
+    #ako jeste ispisuje sljedeci text: putanja: ASCII text
+    if [ $duzina_isf -eq 3 -a ${isf[1]} = "ASCII" -a ${isf[2]} = "text" ]
+    then
+        echo
+        a1=$(sed -n "/${niz[1]}/=" ${niz[2]})
+        a2=($a1)
+        echo "Izraz \"${niz[1]}\" se pojavljuje u datoteci ${niz[2]} na liniji: ${a2[0]}"
+        echo
+    # datoteka se ne moze otvoriti ili ne postoji ili neki drugi razlog
+    elif [ $duzina_isf -ge 3 -a ${isf[1]} = "cannot" -a ${isf[2]} = "open" ]
+    then
+        echo
+        echo "Datoteka ${niz[2]} ne postoji ili putanja ne postoji!!!"
+        echo
+    # datoteka je mozda tekstualna ali moze biti i sa ekstenzijom .cpp ili sa nekom drugom pa necemo citati jer je trazeno samo tekstualne
+    else
+        echo "Upozorenje!!!"
+
+        flag_print=false
+
+        for i in `seq 1 $duzina_isf`
+        do
+            if [ "${isf[$i]}" = "ASCII" ]
+            then
+                flag_print=true
+            fi
+        done
+        
+        if [ $flag_print = true ]
+        then
+            echo "Moguce da je tekstualna datoteka ali nismo sigurni."
+            echo "S'obzirom da nismo sigurni necemo citati sadrzaj datoteke."
+        else
+            echo "Ovo nije tekstualna datoteka!!!"
+        fi   
+    fi
+}
+
+findDat()
+{
+    # provjeravamo da li postoji putanja
+    if test -d ${niz[2]}
+    then
+        # gledamo da li ima uopste datih datoteka
+        file_count=$(find "${niz[2]}" -name "${niz[1]}" | wc -l)
+
+        # ispisujemo ih ukoliko ima
+        if [ $file_count -gt 0 ]
+        then
+            echo
+            echo "Trazeni fajlovi su: "
+            find "$PWD/${niz[2]}" -name "${niz[1]}"
+            echo
+        # nisu pronadjeni fajlovi sa datim nazivom, pa ce mo viditi da li ih ima sa ekstenzijom samo
+        else
+            echo
+            echo "Fajlovi ${niz[1]} nisu pronadjeni!!!"
+            echo
+            
+            ekstenzija=${niz[1]#*.} 
+            
+            file_count=$(find "${niz[2]}" -name "*.$ekstenzija" | wc -l)
+
+            if [ $file_count -gt 0 ]
+            then
+                while [ $flag = false ]
+                do
+                    echo "Postoji datoteke sa ekstenzijom *.$ekstenzija, unesite naredbu: "
+                    echo
+                    echo "|------------------------------|"
+                    echo "|- [DA] - ispis svih fajlova --|"
+                    echo "|- [NE] - prekid operacije ----|"
+                    echo "|------------------------------|"
+                    echo
+                    read -p "Unesite naredbu: " choise
+                    
+                    if [ $choise = "DA" ]
+                    then
+                        echo
+                        echo "Trazeni fajlovi su: "
+                        find "${niz[2]}" -name "*.$ekstenzija"   
+                        flag=true            
+                    elif [ $choise = "NE" ]
+                    then
+                        flag=true
+                    else
+                        echo
+                        echo "Naredba $choise nije definisana!!!"
+                        echo "Pokusajte ponovo!!!" 
+                        echo                   
+                    fi
+                done
+                
+                flag=false
+            fi     
+        fi
+    # putanja uopste ne postoji
+    else 
+        echo
+        echo "Putanja ${niz[2]} ne postoji!!!"
+        echo
+    fi
+}
+
+############################################################################
+###########                         MAIN               #####################
+############################################################################
+
+flag=false
+ime=""
+#kada se pocne izvrsavati program onda se uzma lokacija na kojoj se on nalazi
+#znacajno jer se tu nalazi security.txt datoteka sa korisnickim nalozima - fix_location
+fix_location=$(dirname $0)
+
+while [ $flag = false ]
+do
+
+    #ukoliko se korisnik uloguje onda se u funkciji login_user postavlja flag=true
+    while [ $flag = false ]
+    do
+        echo
+        echo "|------------------------------|"
+        echo "|- login ----------------------|"
+        echo "|- exit -----------------------|"
+        echo "|------------------------------|"
+        echo
+
+        read -p "Unesite naredbu: " com
+
+        if [ "$com" = "exit" ]
+        then
+            echo "Dovidjenja :)"
+            exit
+        elif [ "$com" = "login" ]
+        then
+            login_user
+        else
+            echo "Niste unijeli jednu od navedenih naredbi!!!"
+        fi
+    done
+
+    #znamo da je korisnik se ulogovao pa pa nema potrebe da koristimo drugu promjenljivu, zbog toga postavljamo na false ponovo
+    flag=false
+
+    while [ $flag = false ] 
+    do
+        echo
+        echo "|------------ MENI ------------|"
+        echo
+        echo "|------------------------------|"
+        echo "|- where ----------------------|"
+        echo "|- go putanja -----------------|"
+        echo "|- create [-d] putanja --------|"
+        echo "|- list [putanja] -------------|"
+        echo "|- print datoteka -------------|"
+        echo '|- find "tekst" datoteka ------|'
+        echo "|- findDat datoteka putanja----|"
+        echo "|- help -----------------------|"
+        echo "|- logout ---------------------|"
+        echo "|- exit -----------------------|"
+        echo "|------------------------------|"
+        echo
+
+        read -p "Unesite naredbu: " com
+
+        # svaka rijec se smatra elementom
+        niz=($com)
+        # duzina elemenata prethodne promjenljive
+        duzina=${#niz[@]}
+
+        if [ "${niz[0]}" = "where" -a $duzina -eq 1 ] # trenutna lokacija nasa
+        then
+            where
+        elif [ "${niz[0]}" = "go" -a $duzina -eq 2 ] # mijenjamo poziciju u kojoj se nalazimo
+        then
+            go
+        elif [ "${niz[0]}" = "create" -a $duzina -eq 2 -o "${niz[0]}" = "create" -a $duzina -eq 3 -a "${niz[1]}" = "-d" ] # kreiramo datoteku da li na putanji ili odmah
+        then
+            create
+        elif [ "${niz[0]}" = "list" ]
+        then
+            list
+        elif [ "${niz[0]}" = "print" -a $duzina -eq 2 ]
+        then
+            print
+        elif [ "${niz[0]}" = "find" -a "${niz[1]:0:1}" = '"' -a "${niz[1]:`expr length ${niz[1]} - 1`:`expr length ${niz[1]}`}" = '"' -a $duzina -eq 3 ]
+        then
+            #otklanjamo znak " sa pocetka i kraja
+            niz[1]="${niz[1]:1:`expr length ${niz[1]} - 2`}"
+
+            find_tekst_datoteka
+        elif [ "${niz[0]}" = "findDat" -a $duzina -eq 3 ]
+        then
+            findDat
+        elif [ "${niz[0]}" = "help" -a $duzina -eq 1 ]
+        then
+            help
+        elif [ "${niz[0]}" = "logout" -a $duzina -eq 1 ]
+        then
+            echo 
+            echo "$ime Dovidjenja :)"
+            echo
+            flag=true
+        elif [ "${niz[0]}" = "exit" -a $duzina -eq 1 ]
+        then
+            echo
+            echo "Dovidnjenja :)"
+            echo
+
+            exit
+        else
+            echo
+            echo "Naredba $com nije definisana!!!"
+            echo "Pokusajte ponovo!!!"
+            echo
+        fi
+    done
+
+    #jedini slucaj kada dolazimo do ovoga dijela je ako korisnik izvrsi opciju logout
+    #pa postavljamo flag=false da se ponovi postupak login-a
+    flag=false
+done
+
+exit
